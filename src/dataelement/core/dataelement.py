@@ -5,7 +5,7 @@ import pathlib  # Pfade zu Versuchsordnern und Dateien
 from datetime import datetime  # Erstellen und Bearbeiten von Zeitstempeln
 
 
-class Datenelement:
+class Dataelement:
     def __init__(
         self,
         pfad: pathlib.Path,
