@@ -1,6 +1,4 @@
 import pandas as pd  # Öffnen, Einlesen, Bearbeiten von Exceldaten in Form von Dataframes
-
-# import numpy as np  # mathematische Funktionen
 import pathlib  # Pfade zu Versuchsordnern und Dateien
 from datetime import datetime  # Erstellen und Bearbeiten von Zeitstempeln
 
@@ -16,11 +14,11 @@ class Dataelement:
     ):
         """
         Objekt, welches die Daten einer Datei / eines Versuchs / einer Versuchsreihe beinhaltet.
-        Ein Datenelement kann wiederum aus mehreren Unterelementen bestehen und/oder zu einem Oberelement dazugehören.
+        Ein Dataelement kann wiederum aus mehreren Unterelementen bestehen und/oder zu einem Oberelement dazugehören.
         :param pfad: Pfad zur Datei / zum Versuch(sreihen)ordner (als pathlib-Objekt)
         :param daten: Daten (als Dataframe-Objekt, optional)
-        :param oberelement: Zuweisung des Objekts zu einem übergeordneten Datenelement (optional)
-        :param unterelemente: Liste mit allen zum Objekt gehörenden untergeordneten Datenelementen (optional)
+        :param oberelement: Zuweisung des Objekts zu einem übergeordneten Dataelement (optional)
+        :param unterelemente: Liste mit allen zum Objekt gehörenden untergeordneten Dataelementen (optional)
         """
 
         # übergebene statische Attribute:
@@ -59,10 +57,10 @@ class Dataelement:
 
     def ist_unterelement_von(self, oberelement):
         """
-        weist das Datenelement einem übergeordneten Datenelement zu
-        :param oberelement: muss selbst ein Datenelement sein
+        weist das Dataelement einem übergeordneten Dataelement zu
+        :param oberelement: muss selbst ein Dataelement sein
         """
-        if type(oberelement) == Datenelement:
+        if type(oberelement) == Dataelement:
             self.oberelement = oberelement
             oberelement.unterelemente.append(self)
         else:
@@ -70,7 +68,7 @@ class Dataelement:
                 datetime.now(),
                 "Fehler in",
                 self.name + ":",
-                "Oberelement muss vom Typ Datenelement sein.",
+                "Oberelement muss vom Typ Dataelement sein.",
             )
 
     def lese_daten_unformatiert_ein(self):
@@ -109,7 +107,7 @@ class Dataelement:
         if self.elementtyp == "datei":
             for key in format_dict.keys():
                 if key in self.name:
-                    self.daten = format_dict[key](datenelement=self)
+                    self.daten = format_dict[key](Dataelement=self)
                     break
         else:
             print(
@@ -122,7 +120,7 @@ class Dataelement:
     def mergeasof_unterelemente(self, abfolge_liste: list):
         """
         Reiht die Daten aller Unterlemente nebeneinander an (anhand Zeitstempel) in der Reihenfolge der Listenelemente.
-        Bestehende Daten des Datenelements werden NICHT überschrieben.
+        Bestehende Daten des Dataelements werden NICHT überschrieben.
         :param abfolge_liste: Reihenfolge, in der Unterelemente aufgereiht werden (Listen-Item muss im Namen auftauchen)
         """
         for item in abfolge_liste:
@@ -143,7 +141,7 @@ class Dataelement:
 
     def concat_unterelemente(self):
         """
-        Reiht die Daten aller Unterelemente aneinander. Bestehende Daten des Datenelements werden NICHT überschrieben.
+        Reiht die Daten aller Unterelemente aneinander. Bestehende Daten des Dataelements werden NICHT überschrieben.
         """
         for element in self.unterelemente:
             daten_aktuell = self.daten
