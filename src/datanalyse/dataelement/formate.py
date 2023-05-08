@@ -1,13 +1,20 @@
 import pandas as pd
 from datetime import datetime, timedelta
+
 # from .dataelement import Dataelement - does not work in vsc
 # from src.datanalyse.dataelement.dataelement import Dataelement - does not work in vsc
 from dataelement import Dataelement
 import dfmanipulation as dfm
 
 
-def wincontrol_standard(datenelement: Dataelement, dropna_spalten=True, dropna_zeilen=True, rolling_zeitschritt=None,
-                        resample_zeitschritt="1min", nur_ergebniszeile=False):
+def wincontrol_standard(
+    datenelement: Dataelement,
+    dropna_spalten=True,
+    dropna_zeilen=True,
+    rolling_zeitschritt=None,
+    resample_zeitschritt="1min",
+    nur_ergebniszeile=False,
+):
     """
     Standard-Einlese-Formatierung für xlsx-Daten aus einer WinControl-Tabelle
     :param datenelement: Dataelement
@@ -18,10 +25,13 @@ def wincontrol_standard(datenelement: Dataelement, dropna_spalten=True, dropna_z
     :param nur_ergebniszeile:
     :return: formatiertes Dataelement
     """
-    df = pd.read_excel(datenelement.pfad,
-                       sheet_name=0,
-                       parse_dates=[["Datum", "Zeit"]],  # Datum und Zeit werden zum Zeitstempel kombiniert
-                       )
+    df = pd.read_excel(
+        datenelement.pfad,
+        sheet_name=0,
+        parse_dates=[
+            ["Datum", "Zeit"]
+        ],  # Datum und Zeit werden zum Zeitstempel kombiniert
+    )
 
     # Zeitstempel wird als Index gesetzt
     df.set_index("Datum_Zeit", inplace=True)
@@ -43,9 +53,15 @@ def wincontrol_standard(datenelement: Dataelement, dropna_spalten=True, dropna_z
             # wird alles bis inklusive des Leerzeichens abgeschnitten
             # "df.iloc[1, df.columns.get_loc(Spalte)+1]" entspricht der Einheit in der ersten Zeile eine Spalte
             # daneben; beides zusammen soll den alten Spaltennamen ersetzen
-            df.rename(columns={
-                Spalte: Spalte[(Spalte.find(" ") + 1):] + " (" + df.iloc[0, df.columns.get_loc(Spalte) + 1] + ")"},
-                inplace=True)
+            df.rename(
+                columns={
+                    Spalte: Spalte[(Spalte.find(" ") + 1) :]
+                    + " ("
+                    + df.iloc[0, df.columns.get_loc(Spalte) + 1]
+                    + ")"
+                },
+                inplace=True,
+            )
 
     # Einheiten-Spalten entfernen, indem nur Spalten übernommen werden, die nicht "Unnamed" enthalten (nicht => "~")
     df = df.loc[:, ~df.columns.str.contains("Unnamed")]
@@ -54,14 +70,22 @@ def wincontrol_standard(datenelement: Dataelement, dropna_spalten=True, dropna_z
     df = df.loc[:, sorted(list(df.columns))]
 
     # auf Wunsch Datenmanipulation
-    df = dfm.rolling_resample_ergebniszeile(df, rolling_zeitschritt, resample_zeitschritt, nur_ergebniszeile)
+    df = dfm.rolling_resample_ergebniszeile(
+        df, rolling_zeitschritt, resample_zeitschritt, nur_ergebniszeile
+    )
 
     # Übergebe das fertige Dataframe zurück
     return df
 
 
-def wincontrol_csv(datenelement: Dataelement, dropna_spalten=True, dropna_zeilen=True, rolling_zeitschritt=None,
-                   resample_zeitschritt="1min", nur_ergebniszeile=False):
+def wincontrol_csv(
+    datenelement: Dataelement,
+    dropna_spalten=True,
+    dropna_zeilen=True,
+    rolling_zeitschritt=None,
+    resample_zeitschritt="1min",
+    nur_ergebniszeile=False,
+):
     """
     Standard-Einlese-Formatierung für csv-Daten aus einer WinControl-Tabelle
     :param datenelement: Dataelement
@@ -72,18 +96,20 @@ def wincontrol_csv(datenelement: Dataelement, dropna_spalten=True, dropna_zeilen
     :param nur_ergebniszeile:
     :return: formatiertes Dataelement
     """
-    df = pd.read_csv(datenelement.pfad,
-                     sep=";",
-                     decimal=",",
-                     encoding="ANSI",
-                     index_col=0,
-                     header=2,
-                     skiprows=[3, 4, 5, 6],
-                     parse_dates=[[0, 1]],
-                     dayfirst=True)  # Verhindert Verwechslung von Tag und Monat beim Einlesen des Datums
+    df = pd.read_csv(
+        datenelement.pfad,
+        sep=";",
+        decimal=",",
+        encoding="ANSI",
+        index_col=0,
+        header=2,
+        skiprows=[3, 4, 5, 6],
+        parse_dates=[[0, 1]],
+        dayfirst=True,
+    )  # Verhindert Verwechslung von Tag und Monat beim Einlesen des Datums
 
     # Indexspalte einen ordentlichen Namen geben (heißt aktuell etwa "Kommentar_Unnamed: 1")
-    df.index.names = ['Datum_Zeit']
+    df.index.names = ["Datum_Zeit"]
 
     # drop alle Spalten, bei denen absolut nichts drin steht (beugt Fehlern vor, tritt vor allem bei Sollwerten auf)
     if dropna_spalten:
@@ -97,18 +123,21 @@ def wincontrol_csv(datenelement: Dataelement, dropna_spalten=True, dropna_zeilen
     df = df.loc[:, sorted(list(df.columns))]
 
     # auf Wunsch Datenmanipulation
-    df = dfm.rolling_resample_ergebniszeile(df, rolling_zeitschritt, resample_zeitschritt, nur_ergebniszeile)
+    df = dfm.rolling_resample_ergebniszeile(
+        df, rolling_zeitschritt, resample_zeitschritt, nur_ergebniszeile
+    )
 
     # Übergebe das fertige Dataframe zurück
     return df
 
 
 def mothership(datenelement: Dataelement):
-    df = pd.read_excel(datenelement.pfad,
-                       sheet_name=0,
-                       header=4,
-                       index_col=0,
-                       )
+    df = pd.read_excel(
+        datenelement.pfad,
+        sheet_name=0,
+        header=4,
+        index_col=0,
+    )
 
     # Überspring die ersten beiden Zeilen, da leer bzw. 0
     df = df.iloc[2:]
@@ -119,9 +148,11 @@ def mothership(datenelement: Dataelement):
     # Das Datum der Messung wird aus dem Dateinamen entnommen
     messdatum = pd.to_datetime(str(datenelement.pfad.name)[37:47], format="%d_%m_%Y")
     # ersetze Datum im Zeitstempel durch das Datum der Speicherzeit
-    df.index = df.index.map(lambda x: x.replace(year=messdatum.year,
-                                                month=messdatum.month,
-                                                day=messdatum.day))
+    df.index = df.index.map(
+        lambda x: x.replace(
+            year=messdatum.year, month=messdatum.month, day=messdatum.day
+        )
+    )
 
     # Resampling der Daten
     df = df.resample("1min").mean()
@@ -135,11 +166,12 @@ def mothership(datenelement: Dataelement):
 
 
 def klimaanlage(datenelement: Dataelement):
-    df = pd.read_excel(datenelement.pfad,
-                       sheet_name=0,
-                       header=9,
-                       index_col="Name",  # Die Zeitstempel stehen in Excel unter der Spalte "Name"
-                       )
+    df = pd.read_excel(
+        datenelement.pfad,
+        sheet_name=0,
+        header=9,
+        index_col="Name",  # Die Zeitstempel stehen in Excel unter der Spalte "Name"
+    )
 
     # Überspring die ersten 4 Zeilen, da leer bzw. 0
     df = df.iloc[4:]
@@ -153,15 +185,28 @@ def klimaanlage(datenelement: Dataelement):
 
     # Letzter Schliff:
     # Übernehme zur besseren Übersicht nur die nützlichen Daten
-    df = df.loc[:, ["Außenluft Temperatur (TV6)", "Abluft (TV5)", "Zuluft (TV3)", "Status Kühlen", "Status Heizen"]]
+    df = df.loc[
+        :,
+        [
+            "Außenluft Temperatur (TV6)",
+            "Abluft (TV5)",
+            "Zuluft (TV3)",
+            "Status Kühlen",
+            "Status Heizen",
+        ],
+    ]
 
     # Benenne Spalten
-    df.rename(columns={"Außenluft Temperatur (TV6)": "Hallentemperatur",
-                       "Abluft (TV5)": "Ablufttemperatur",
-                       "Zuluft (TV3)": "Zulufttemperatur",
-                       "Status Kühlen": "Regler Kühlen",
-                       "Status Heizen": "Regler Heizen"},
-              inplace=True)
+    df.rename(
+        columns={
+            "Außenluft Temperatur (TV6)": "Hallentemperatur",
+            "Abluft (TV5)": "Ablufttemperatur",
+            "Zuluft (TV3)": "Zulufttemperatur",
+            "Status Kühlen": "Regler Kühlen",
+            "Status Heizen": "Regler Heizen",
+        },
+        inplace=True,
+    )
 
     # Resampling der Daten
     df = df.resample("1min").mean()
@@ -175,12 +220,13 @@ def umbuzoo_standard(datenelement: Dataelement):
 
 
 def umbuzoo_person(datenelement: Dataelement):
-    df = pd.read_excel(datenelement.pfad,
-                       sheet_name=0,
-                       header=None,
-                       index_col=None,
-                       skiprows=8,  # 8 Zeilen unnützer Informationen werden direkt beim Einlesen übersprungen
-                       )
+    df = pd.read_excel(
+        datenelement.pfad,
+        sheet_name=0,
+        header=None,
+        index_col=None,
+        skiprows=8,  # 8 Zeilen unnützer Informationen werden direkt beim Einlesen übersprungen
+    )
 
     # Spalten entfernen, die komplett leer sind (Abstandsspalten des ursprünglichen Files)
     df.dropna(axis=1, how="all", inplace=True)
@@ -215,29 +261,36 @@ def umbuzoo_person(datenelement: Dataelement):
     df.index.name = "Startzeitpunkt"
 
     # Benenne Spalten
-    df.rename(columns={"Bitte geben Sie Ihr Alter (in Jahren) an.": "Alter (a)",
-                       "Bitte geben Sie Ihr Geschlecht an.": "Geschlecht",
-                       "Bitte geben Sie Ihr Gewicht (in kg) an.": "Gewicht (kg)",
-                       "Bitte geben Sie Ihre Körpergröße (in cm) an.": "Größe (cm)",
-                       "Was schätzen Sie, ist Ihre Wohlfühl-Raumtemperatur (in °C)?": "Wunschtemperatur (°C)",
-                       "Wie haben Sie den Weg bis hierher zurückgelegt?": "Weg"},
-              inplace=True)
+    df.rename(
+        columns={
+            "Bitte geben Sie Ihr Alter (in Jahren) an.": "Alter (a)",
+            "Bitte geben Sie Ihr Geschlecht an.": "Geschlecht",
+            "Bitte geben Sie Ihr Gewicht (in kg) an.": "Gewicht (kg)",
+            "Bitte geben Sie Ihre Körpergröße (in cm) an.": "Größe (cm)",
+            "Was schätzen Sie, ist Ihre Wohlfühl-Raumtemperatur (in °C)?": "Wunschtemperatur (°C)",
+            "Wie haben Sie den Weg bis hierher zurückgelegt?": "Weg",
+        },
+        inplace=True,
+    )
 
     # Wandle Antworten in Zahlen um, da sich damit besser rechnen lässt bzw. Darstellung in Diagrammen einfacher:
     df = dfm.ersetze_spalten_werte(df, ["Geschlecht"], ["Männlich", "Weiblich"], [1, 0])
-    df = dfm.ersetze_spalten_werte(df, ["Geschlecht"], ["männlich", "weiblich", "divers"], [1, 0, -1])  # V2.0
+    df = dfm.ersetze_spalten_werte(
+        df, ["Geschlecht"], ["männlich", "weiblich", "divers"], [1, 0, -1]
+    )  # V2.0
 
     # Übergebe das fertige Dataframe zurück
     return df
 
 
 def umbuzoo_abschluss_viessmann(datenelement: Dataelement):
-    df = pd.read_excel(datenelement.pfad,
-                       sheet_name=0,
-                       header=None,
-                       index_col=None,
-                       skiprows=8,  # 8 Zeilen unnützer Informationen werden direkt beim Einlesen übersprungen
-                       )
+    df = pd.read_excel(
+        datenelement.pfad,
+        sheet_name=0,
+        header=None,
+        index_col=None,
+        skiprows=8,  # 8 Zeilen unnützer Informationen werden direkt beim Einlesen übersprungen
+    )
 
     # Spalten entfernen, die komplett leer sind (Abstandsspalten des ursprünglichen Files)
     df.dropna(axis=1, how="all", inplace=True)
@@ -273,36 +326,48 @@ def umbuzoo_abschluss_viessmann(datenelement: Dataelement):
     df.index.name = "Startzeitpunkt"
 
     # Benenne Spalten
-    df.rename(columns={"(Bitte beurteilen Sie aus Ihrer Sicht die folgenden Punkte zum soeben genutzten Heizsystem.) "
-                       "Die Bedienung des Heizsystems über den Regler am PC war leicht verständlich.": "Reglerbewertung",
-                       "(Bitte beurteilen Sie aus Ihrer Sicht die folgenden Punkte zum soeben genutzten Heizsystem.) "
-                       "Das Heizsystem hat auf meine Änderungen schnell reagiert.": "Reakionsgeschwindigkeit",
-                       "(Bitte beurteilen Sie aus Ihrer Sicht die folgenden Punkte zum soeben genutzten Heizsystem.) "
-                       "Das Verhalten des Heizsystems war wie erwartet.": "Erwartung",
-                       "(Bitte beurteilen Sie aus Ihrer Sicht die folgenden Punkte zum soeben genutzten Heizsystem.) "
-                       "Die Positionierung des Heizsystems war genau richtig.": "Positionierung",
-                       "Falls Sie Aussagen der vorherigen Seite weniger oder nicht zugestimmt haben, "
-                       "teilen Sie uns bitte Ihre Verbesserungswünsche mit.": "Verbesserungswünsche"},
-              inplace=True)
+    df.rename(
+        columns={
+            "(Bitte beurteilen Sie aus Ihrer Sicht die folgenden Punkte zum soeben genutzten Heizsystem.) "
+            "Die Bedienung des Heizsystems über den Regler am PC war leicht verständlich.": "Reglerbewertung",
+            "(Bitte beurteilen Sie aus Ihrer Sicht die folgenden Punkte zum soeben genutzten Heizsystem.) "
+            "Das Heizsystem hat auf meine Änderungen schnell reagiert.": "Reakionsgeschwindigkeit",
+            "(Bitte beurteilen Sie aus Ihrer Sicht die folgenden Punkte zum soeben genutzten Heizsystem.) "
+            "Das Verhalten des Heizsystems war wie erwartet.": "Erwartung",
+            "(Bitte beurteilen Sie aus Ihrer Sicht die folgenden Punkte zum soeben genutzten Heizsystem.) "
+            "Die Positionierung des Heizsystems war genau richtig.": "Positionierung",
+            "Falls Sie Aussagen der vorherigen Seite weniger oder nicht zugestimmt haben, "
+            "teilen Sie uns bitte Ihre Verbesserungswünsche mit.": "Verbesserungswünsche",
+        },
+        inplace=True,
+    )
 
     # Wandle Antworten in Zahlen um, da sich damit besser rechnen lässt bzw. Darstellung in Diagrammen einfacher:
-    df = dfm.ersetze_spalten_werte(df,
-                                   ["Reglerbewertung", "Reakionsgeschwindigkeit", "Erwartung", "Positionierung"],
-                                   ["stimme voll zu", "stimme etwas zu", "weder noch", "stimme weniger zu",
-                                           "stimme nicht zu"],
-                                   [2, 1, 0, -1, -2])
+    df = dfm.ersetze_spalten_werte(
+        df,
+        ["Reglerbewertung", "Reakionsgeschwindigkeit", "Erwartung", "Positionierung"],
+        [
+            "stimme voll zu",
+            "stimme etwas zu",
+            "weder noch",
+            "stimme weniger zu",
+            "stimme nicht zu",
+        ],
+        [2, 1, 0, -1, -2],
+    )
 
     # Übergebe das fertige Dataframe zurück
     return df
 
 
 def umbuzoo_klimaraum(datenelement: Dataelement):
-    df = pd.read_excel(datenelement.pfad,
-                       sheet_name=0,
-                       header=None,
-                       index_col=None,
-                       skiprows=8,  # 8 Zeilen unnützer Informationen werden direkt beim Einlesen übersprungen
-                       )
+    df = pd.read_excel(
+        datenelement.pfad,
+        sheet_name=0,
+        header=None,
+        index_col=None,
+        skiprows=8,  # 8 Zeilen unnützer Informationen werden direkt beim Einlesen übersprungen
+    )
 
     # Spalten entfernen, die komplett leer sind (Abstandsspalten des ursprünglichen Files)
     df.dropna(axis=1, how="all", inplace=True)
@@ -337,59 +402,59 @@ def umbuzoo_klimaraum(datenelement: Dataelement):
     df.index.name = "Startzeitpunkt"
 
     # Benenne Spalten um (wenn eine Spalte mal nicht existiert, wird kein Fehler ausgeworfen)
-    df.rename(columns={"(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Arme:": "Arme",
-                       "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Beine:": "Beine",
-                       "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Füße:": "Füße",
-                       "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Hände:": "Hände",
-                       "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Kopf:": "Kopf",
-                       "(Wie empfinden Sie die momentane Raumtemperatur?) Es ist...": "Global",
-                       "Empfinden Sie es irgendwo am Körper als kühl oder warm?": "lokal?",
-                       "Ist dies unangenehm?": "unangenehm?",  # Wortlaut der Frage beim Deckensystem
-                       "Empfinden Sie dies als unangenehm?": "unangenehm?",  # Wortlaut der Frage beim Halbraum
-                       "Haben Sie noch Anmerkungen?": "Anmerkungen",
-                       "Möchten Sie eine Änderung der Raumtemperatur?": "Änderung?",
-                       "Welche Änderung wünschen Sie sich?": "Wunsch",
-                       "Wie fühlt sich die Luft für Sie an?": "Luftqualität"},
-              inplace=True)
+    df.rename(
+        columns={
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Arme:": "Arme",
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Beine:": "Beine",
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Füße:": "Füße",
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Hände:": "Hände",
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Kopf:": "Kopf",
+            "(Wie empfinden Sie die momentane Raumtemperatur?) Es ist...": "Global",
+            "Empfinden Sie es irgendwo am Körper als kühl oder warm?": "lokal?",
+            "Ist dies unangenehm?": "unangenehm?",  # Wortlaut der Frage beim Deckensystem
+            "Empfinden Sie dies als unangenehm?": "unangenehm?",  # Wortlaut der Frage beim Halbraum
+            "Haben Sie noch Anmerkungen?": "Anmerkungen",
+            "Möchten Sie eine Änderung der Raumtemperatur?": "Änderung?",
+            "Welche Änderung wünschen Sie sich?": "Wunsch",
+            "Wie fühlt sich die Luft für Sie an?": "Luftqualität",
+        },
+        inplace=True,
+    )
 
     # Wandle Antworten in Zahlen um, da sich damit besser rechnen lässt bzw. Darstellung in Diagrammen einfacher:
     # Liste der Zahlen wird mal explizit, mal mit "range" gebildet - einfach, weil es geht :)
-    df = dfm.ersetze_spalten_werte(df,
-                                   ["Arme", "Beine", "Füße", "Hände", "Kopf"],
-                                   ["kühl", "neutral", "warm", ""],
-                                   [-1, 0, 1, 0]
-                                   )
-    df = dfm.ersetze_spalten_werte(df,
-                                   ["Global"],
-                                   ["zu kühl", "kühl", "etwas kühl", "neutral", "etwas warm", "warm", "zu warm"],
-                                   range(-3, 4)
-                                   )
-    df = dfm.ersetze_spalten_werte(df,
-                                   ["lokal?", "unangenehm?", "Änderung?"],
-                                   ["ja", "nein", ""],
-                                   [1, 0, 0]
-                                   )
-    df = dfm.ersetze_spalten_werte(df,
-                                   ["Wunsch"],
-                                   ["wärmer", "kühler", ""],
-                                   [1, -1, 0]
-                                   )
-    df = dfm.ersetze_spalten_werte(df,
-                                   ["Luftqualität"],
-                                   ["1", "2", "3", "4", "5"],
-                                   range(-2, 3))
+    df = dfm.ersetze_spalten_werte(
+        df,
+        ["Arme", "Beine", "Füße", "Hände", "Kopf"],
+        ["kühl", "neutral", "warm", ""],
+        [-1, 0, 1, 0],
+    )
+    df = dfm.ersetze_spalten_werte(
+        df,
+        ["Global"],
+        ["zu kühl", "kühl", "etwas kühl", "neutral", "etwas warm", "warm", "zu warm"],
+        range(-3, 4),
+    )
+    df = dfm.ersetze_spalten_werte(
+        df, ["lokal?", "unangenehm?", "Änderung?"], ["ja", "nein", ""], [1, 0, 0]
+    )
+    df = dfm.ersetze_spalten_werte(df, ["Wunsch"], ["wärmer", "kühler", ""], [1, -1, 0])
+    df = dfm.ersetze_spalten_werte(
+        df, ["Luftqualität"], ["1", "2", "3", "4", "5"], range(-2, 3)
+    )
 
     # Übergebe das fertige Dataframe zurück
     return df
 
 
 def umbuzoo_klimaraum_hybrid(datenelement: Dataelement):
-    df = pd.read_excel(datenelement.pfad,
-                       sheet_name=0,
-                       header=None,
-                       index_col=None,
-                       skiprows=8,  # 8 Zeilen unnützer Informationen werden direkt beim Einlesen übersprungen
-                       )
+    df = pd.read_excel(
+        datenelement.pfad,
+        sheet_name=0,
+        header=None,
+        index_col=None,
+        skiprows=8,  # 8 Zeilen unnützer Informationen werden direkt beim Einlesen übersprungen
+    )
 
     # Spalten entfernen, die komplett leer sind (Abstandsspalten des ursprünglichen Files)
     df.dropna(axis=1, how="all", inplace=True)
@@ -439,65 +504,80 @@ def umbuzoo_klimaraum_hybrid(datenelement: Dataelement):
     df.index.name = "Startzeitpunkt"
 
     # Benenne Spalten um (wenn eine Spalte mal nicht existiert, wird kein Fehler ausgeworfen)
-    df.rename(columns={"(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Arme:": "Arme",
-                       "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Beine:": "Beine",
-                       "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Füße:": "Füße",
-                       "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Hände:": "Hände",
-                       "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Kopf:": "Kopf",
-                       "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Nacken:": "Nacken",
-                       "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Rücken:": "Rücken",
-                       "(Wie empfinden Sie die momentane Raumtemperatur?) Es ist...": "Global",
-                       "Empfinden Sie es irgendwo am Körper als kühl oder warm?": "lokal?",
-                       "Empfinden Sie irgendwo am Körper Zuglufterscheinungen?": "Zugluft?",
-                       "Ist dies unangenehm?": "lokal_unangenehm?",  # Wortlaut der Frage beim Deckensystem
-                       "Empfinden Sie dies als unangenehm?": "lokal_unangenehm?",  # Wortlaut der Frage beim Halbraum
-                       "Haben Sie noch Anmerkungen?": "Anmerkungen",
-                       "Möchten Sie eine Änderung der Raumtemperatur?": "Änderung?",
-                       "Welche Änderung wünschen Sie sich?": "Wunsch",
-                       "Wie fühlt sich die Luft für Sie an?": "Luftqualität",
-                       "Wie sehr nehmen Sie Störgeräusche der Lüftungsanlage wahr?": "Störgeräusche"},
-              inplace=True)
+    df.rename(
+        columns={
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Arme:": "Arme",
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Beine:": "Beine",
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Füße:": "Füße",
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Hände:": "Hände",
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Kopf:": "Kopf",
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Nacken:": "Nacken",
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Rücken:": "Rücken",
+            "(Wie empfinden Sie die momentane Raumtemperatur?) Es ist...": "Global",
+            "Empfinden Sie es irgendwo am Körper als kühl oder warm?": "lokal?",
+            "Empfinden Sie irgendwo am Körper Zuglufterscheinungen?": "Zugluft?",
+            "Ist dies unangenehm?": "lokal_unangenehm?",  # Wortlaut der Frage beim Deckensystem
+            "Empfinden Sie dies als unangenehm?": "lokal_unangenehm?",  # Wortlaut der Frage beim Halbraum
+            "Haben Sie noch Anmerkungen?": "Anmerkungen",
+            "Möchten Sie eine Änderung der Raumtemperatur?": "Änderung?",
+            "Welche Änderung wünschen Sie sich?": "Wunsch",
+            "Wie fühlt sich die Luft für Sie an?": "Luftqualität",
+            "Wie sehr nehmen Sie Störgeräusche der Lüftungsanlage wahr?": "Störgeräusche",
+        },
+        inplace=True,
+    )
 
     # Wandle Antworten in Zahlen um, da sich damit besser rechnen lässt bzw. Darstellung in Diagrammen einfacher:
     # Liste der Zahlen wird mal explizit, mal mit "range" gebildet - einfach, weil es geht :)
-    df = dfm.ersetze_spalten_werte(df,
-                                   ["Arme", "Beine", "Füße", "Hände", "Kopf", "Nacken", "Rücken"],
-                                   ["kühl", "neutral", "warm", ""],
-                                   [-1, 0, 1, 0])
-    df = dfm.ersetze_spalten_werte(df,
-                                   ["Global"],
-                                   ["zu kühl", "kühl", "etwas kühl", "neutral", "etwas warm", "warm", "zu warm"],
-                                   range(-3, 4))
-    df = dfm.ersetze_spalten_werte(df,
-                                   ["lokal?", "lokal_unangenehm?", "Änderung?", "Zugluft?",
-                                           "Zugluft_unangenehm?"],
-                                   ["ja", "nein", ""],
-                                   [1, 0, 0])
-    df = dfm.ersetze_spalten_werte(df,
-                                   ["Wunsch"],
-                                   ["wärmer", "kühler", ""],
-                                   [1, -1, 0])
-    df = dfm.ersetze_spalten_werte(df,
-                                   ["Zugluft_Arme", "Zugluft_Beine", "Zugluft_Füße", "Zugluft_Hände",
-                                           "Zugluft_Kopf", "Zugluft_Nacken", "Zugluft_Rücken"],
-                                   ["Arme", "Beine", "Füße", "Hände", "Kopf", "Nacken", "Rücken", ""],
-                                   [1, 1, 1, 1, 1, 1, 1, 0])
-    df = dfm.ersetze_spalten_werte(df,
-                                   ["Luftqualität", "Störgeräusche"],
-                                   ["1", "2", "3", "4", "5"],
-                                   range(1, 6))
+    df = dfm.ersetze_spalten_werte(
+        df,
+        ["Arme", "Beine", "Füße", "Hände", "Kopf", "Nacken", "Rücken"],
+        ["kühl", "neutral", "warm", ""],
+        [-1, 0, 1, 0],
+    )
+    df = dfm.ersetze_spalten_werte(
+        df,
+        ["Global"],
+        ["zu kühl", "kühl", "etwas kühl", "neutral", "etwas warm", "warm", "zu warm"],
+        range(-3, 4),
+    )
+    df = dfm.ersetze_spalten_werte(
+        df,
+        ["lokal?", "lokal_unangenehm?", "Änderung?", "Zugluft?", "Zugluft_unangenehm?"],
+        ["ja", "nein", ""],
+        [1, 0, 0],
+    )
+    df = dfm.ersetze_spalten_werte(df, ["Wunsch"], ["wärmer", "kühler", ""], [1, -1, 0])
+    df = dfm.ersetze_spalten_werte(
+        df,
+        [
+            "Zugluft_Arme",
+            "Zugluft_Beine",
+            "Zugluft_Füße",
+            "Zugluft_Hände",
+            "Zugluft_Kopf",
+            "Zugluft_Nacken",
+            "Zugluft_Rücken",
+        ],
+        ["Arme", "Beine", "Füße", "Hände", "Kopf", "Nacken", "Rücken", ""],
+        [1, 1, 1, 1, 1, 1, 1, 0],
+    )
+    df = dfm.ersetze_spalten_werte(
+        df, ["Luftqualität", "Störgeräusche"], ["1", "2", "3", "4", "5"], range(1, 6)
+    )
 
     # Übergebe das fertige Dataframe zurück
     return df
 
 
 def umbuzoo_klimaraum_viessmann(datenelement: Dataelement):
-    df = pd.read_excel(datenelement.pfad,
-                       sheet_name=0,
-                       header=None,
-                       index_col=None,
-                       skiprows=8,  # 8 Zeilen unnützer Informationen werden direkt beim Einlesen übersprungen
-                       )
+    df = pd.read_excel(
+        datenelement.pfad,
+        sheet_name=0,
+        header=None,
+        index_col=None,
+        skiprows=8,  # 8 Zeilen unnützer Informationen werden direkt beim Einlesen übersprungen
+    )
 
     # Spalten entfernen, die komplett leer sind (Abstandsspalten des ursprünglichen Files)
     df.dropna(axis=1, how="all", inplace=True)
@@ -532,62 +612,73 @@ def umbuzoo_klimaraum_viessmann(datenelement: Dataelement):
     df.index.name = "Startzeitpunkt"
 
     # Benenne Spalten um (wenn eine Spalte mal nicht existiert, wird kein Fehler ausgeworfen)
-    df.rename(columns={"(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Arme:": "Arme",
-                       "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Beine:": "Beine",
-                       "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Füße:": "Füße",
-                       "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Hände:": "Hände",
-                       "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Kopf:": "Kopf",
-                       "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Nacken:": "Nacken",
-                       "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Rücken:": "Rücken",
-                       "(Wie empfinden Sie jetzt gerade die aktuelle Raumtemperatur?) Es ist...": "Global",
-                       "Empfinden Sie es irgendwo am Körper als kühl oder warm?": "lokal?",
-                       "Ist dies für Sie unangenehm?": "lokal_unangenehm?",  # Wortlaut der Frage bei Viessmann
-                       "Haben Sie noch Anmerkungen?": "Anmerkungen",
-                       "Haben Sie seit der letzten Umfrage eine Veränderung am Heizungsregler vorgenommen?": "Reglereingriff",
-                       "Möchten Sie eine Änderung der Raumtemperatur?": "Änderung?",
-                       "Sind Sie im Allgemeinen mit dem Raumklima zufrieden?": "Zufriedenheit",
-                       "Warum haben Sie diese Änderung vorgenommen?": "Reglerbegründung",
-                       "Wie fühlt sich die Luft für Sie an?": "Luftqualität"},
-              inplace=True)
+    df.rename(
+        columns={
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Arme:": "Arme",
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Beine:": "Beine",
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Füße:": "Füße",
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Hände:": "Hände",
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Kopf:": "Kopf",
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Nacken:": "Nacken",
+            "(Bitte geben Sie für den jeweiligen Körperbereich Ihre Empfindung an.) Rücken:": "Rücken",
+            "(Wie empfinden Sie jetzt gerade die aktuelle Raumtemperatur?) Es ist...": "Global",
+            "Empfinden Sie es irgendwo am Körper als kühl oder warm?": "lokal?",
+            "Ist dies für Sie unangenehm?": "lokal_unangenehm?",  # Wortlaut der Frage bei Viessmann
+            "Haben Sie noch Anmerkungen?": "Anmerkungen",
+            "Haben Sie seit der letzten Umfrage eine Veränderung am Heizungsregler vorgenommen?": "Reglereingriff",
+            "Möchten Sie eine Änderung der Raumtemperatur?": "Änderung?",
+            "Sind Sie im Allgemeinen mit dem Raumklima zufrieden?": "Zufriedenheit",
+            "Warum haben Sie diese Änderung vorgenommen?": "Reglerbegründung",
+            "Wie fühlt sich die Luft für Sie an?": "Luftqualität",
+        },
+        inplace=True,
+    )
 
     # Wandle Antworten in Zahlen um, da sich damit besser rechnen lässt bzw. Darstellung in Diagrammen einfacher:
     # Liste der Zahlen wird mal explizit, mal mit "range" gebildet - einfach, weil es geht :)
-    df = dfm.ersetze_spalten_werte(df,
-                                   ["Arme", "Beine", "Füße", "Hände", "Kopf", "Nacken", "Rücken"],
-                                   ["kühl", "neutral", "warm", ""],
-                                   [-1, 0, 1, 0])
-    df = dfm.ersetze_spalten_werte(df,
-                                   ["Global"],
-                                   ["kalt", "kühl", "etwas kühl", "neutral", "etwas warm", "warm", "heiß"],
-                                   range(-3, 4))
-    df = dfm.ersetze_spalten_werte(df,
-                                   ["lokal?", "lokal_unangenehm?", "Reglereingriff", "Zufriedenheit"],
-                                   ["ja", "nein", ""],
-                                   [1, 0, 0])
-    df = dfm.ersetze_spalten_werte(df,
-                                   ["Änderung?"],
-                                   ["wärmer", "keine Veränderung", "kühler"],
-                                   [1, 0, -1])
-    df = dfm.ersetze_spalten_werte(df,
-                                   ["Luftqualität"],
-                                   ["1", "2", "3", "4", "5"],
-                                   range(-2, 3))
+    df = dfm.ersetze_spalten_werte(
+        df,
+        ["Arme", "Beine", "Füße", "Hände", "Kopf", "Nacken", "Rücken"],
+        ["kühl", "neutral", "warm", ""],
+        [-1, 0, 1, 0],
+    )
+    df = dfm.ersetze_spalten_werte(
+        df,
+        ["Global"],
+        ["kalt", "kühl", "etwas kühl", "neutral", "etwas warm", "warm", "heiß"],
+        range(-3, 4),
+    )
+    df = dfm.ersetze_spalten_werte(
+        df,
+        ["lokal?", "lokal_unangenehm?", "Reglereingriff", "Zufriedenheit"],
+        ["ja", "nein", ""],
+        [1, 0, 0],
+    )
+    df = dfm.ersetze_spalten_werte(
+        df, ["Änderung?"], ["wärmer", "keine Veränderung", "kühler"], [1, 0, -1]
+    )
+    df = dfm.ersetze_spalten_werte(
+        df, ["Luftqualität"], ["1", "2", "3", "4", "5"], range(-2, 3)
+    )
 
     # Übergebe das fertige Dataframe zurück
     return df
 
 
 def versuchsleitung_normhybr(datenelement: Dataelement):
-    df = pd.read_excel(datenelement.pfad,
-                       sheet_name=0,
-                       header=0,
-                       index_col=0,
-                       nrows=9,  # Verwende nur die ersten 9 Zeilen
-                       usecols="A:H"  # Verwende nur diese Spalten (G/H enthält ggf. Bemerkungen)
-                       )
+    df = pd.read_excel(
+        datenelement.pfad,
+        sheet_name=0,
+        header=0,
+        index_col=0,
+        nrows=9,  # Verwende nur die ersten 9 Zeilen
+        usecols="A:H",  # Verwende nur diese Spalten (G/H enthält ggf. Bemerkungen)
+    )
 
     # Benenne letzte Spalten um, sodass diese "Kommentar" heißen
-    df.rename(columns={"Unnamed: 6": "Kommentar", "Unnamed: 7": "Kommentar"}, inplace=True)
+    df.rename(
+        columns={"Unnamed: 6": "Kommentar", "Unnamed: 7": "Kommentar"}, inplace=True
+    )
 
     # Entferne leere Spalten (es verbleibt nur die Kommentarspalte, in der auch etwas steht)
     df.dropna(how="all", axis=1, inplace=True)
@@ -610,14 +701,17 @@ def versuchsleitung_normhybr(datenelement: Dataelement):
 
 
 def versuchsleitung_halbraum(datenelement: Dataelement):
-    df = pd.read_excel(datenelement.pfad,
-                       sheet_name=0,
-                       header=9,
-                       index_col=1,
-                       nrows=7,  # Verwende nur die ersten 8 Zeilen
-                       usecols="B:G"  # Verwende nur diese 5 Spalten
-                       )
-    df.drop(index=["hh:mm"], inplace=True)  # Löschen der ersten Zeile, da nur Einheiten enthalten
+    df = pd.read_excel(
+        datenelement.pfad,
+        sheet_name=0,
+        header=9,
+        index_col=1,
+        nrows=7,  # Verwende nur die ersten 8 Zeilen
+        usecols="B:G",  # Verwende nur diese 5 Spalten
+    )
+    df.drop(
+        index=["hh:mm"], inplace=True
+    )  # Löschen der ersten Zeile, da nur Einheiten enthalten
 
     # Konvertiere Uhrzeit mit dem Messdatum (Erhalt aus dem Änderungsdatum der Datei) zu echtem Zeitstempel
     messdatum = datetime.utcfromtimestamp(datenelement.pfad.stat().st_mtime)
@@ -631,12 +725,13 @@ def versuchsleitung_halbraum(datenelement: Dataelement):
 
 
 def versuchsleitung_viessmann(datenelement: Dataelement):
-    df = pd.read_excel(datenelement.pfad,
-                       sheet_name=0,
-                       header=0,
-                       index_col=0,
-                       nrows=6,  # Verwende nur die ersten 8 Zeilen
-                       )
+    df = pd.read_excel(
+        datenelement.pfad,
+        sheet_name=0,
+        header=0,
+        index_col=0,
+        nrows=6,  # Verwende nur die ersten 8 Zeilen
+    )
 
     # Konvertiere Uhrzeit mit dem Messdatum (Erhalt aus dem Änderungsdatum der Datei) zu echtem Zeitstempel
     messdatum_raw = datenelement.name[:10].replace("_", "-")
@@ -648,11 +743,13 @@ def versuchsleitung_viessmann(datenelement: Dataelement):
 
 
 def versuchsleitung_standard(datenelement: Dataelement):
-    df = pd.read_excel(datenelement.pfad,
-                       sheet_name=0,
-                       header=0,
-                       index_col=0,
-                       parse_dates=[["Datum", "Uhrzeit"]])  # Verhindert Verwechslung von Tag und Monat beim Einlesen des Datums
+    df = pd.read_excel(
+        datenelement.pfad,
+        sheet_name=0,
+        header=0,
+        index_col=0,
+        parse_dates=[["Datum", "Uhrzeit"]],
+    )  # Verhindert Verwechslung von Tag und Monat beim Einlesen des Datums
 
     # Übergebe das fertige Dataframe zurück
     return df

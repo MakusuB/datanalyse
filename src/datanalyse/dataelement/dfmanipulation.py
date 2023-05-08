@@ -4,8 +4,12 @@ import numpy as np
 """ Funktionen zur Manipulation von Dataframes """
 
 
-def rolling_resample_ergebniszeile(df: pd.DataFrame, rolling_zeitschritt=None, resample_zeitschritt=None,
-                                   nur_ergebniszeile=False):
+def rolling_resample_ergebniszeile(
+    df: pd.DataFrame,
+    rolling_zeitschritt=None,
+    resample_zeitschritt=None,
+    nur_ergebniszeile=False,
+):
     """
     Bündelung häufig wiederkehrender letzter Schritte in Verbindung mit Dataframes: Gleitende Mittelwertbildung
     (Rolling), Resample und Bildung einer Ergebniszeile mit Mittelwerten für jede Spalte.
@@ -47,9 +51,13 @@ def ersetze_spalten_werte(df: pd.DataFrame, spalten_liste, alt_liste, neu_liste)
     if len(alt_liste) == len(neu_liste):
         # In den angegebenen Spalten wird jeder alte Wert einzeln durch den dazugehörigen neuen ersetzt
         for i in range(0, len(alt_liste)):
-            df.loc[:, spalten_liste] = df.loc[:, spalten_liste].replace(to_replace=alt_liste[i], value=neu_liste[i])
+            df.loc[:, spalten_liste] = df.loc[:, spalten_liste].replace(
+                to_replace=alt_liste[i], value=neu_liste[i]
+            )
     else:
-        print("ErsetzeSpaltenWerte: Anzahl der neuen und alten Werte ist nicht identisch.")
+        print(
+            "ErsetzeSpaltenWerte: Anzahl der neuen und alten Werte ist nicht identisch."
+        )
     # Noch vorhandene leere Strings ("") mit NaN (Not a Number) ersetzen, damit Spaltentyp ggf. float ("Zahl") wird
     df.loc[:, spalten_liste] = df.loc[:, spalten_liste].replace("", np.nan)
     return df

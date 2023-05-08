@@ -2,9 +2,15 @@ import matplotlib.pyplot as plt
 
 
 class Diagramm:
-
-    def __init__(self, name, figsize=(5.5, 3.5), pfad="diagramme/", y2=False,
-                 colors: list = "standard", linestyles: list = "standard"):
+    def __init__(
+        self,
+        name,
+        figsize=(5.5, 3.5),
+        pfad="diagramme/",
+        y2=False,
+        colors: list = "standard",
+        linestyles: list = "standard",
+    ):
         """
         Superklasse für Diagramme
         :param name: Name des Diagramms (entspricht gewünschtem Dateinamen)
@@ -24,17 +30,19 @@ class Diagramm:
 
         # generelle Festlegungen zu Plot-Farben
         if colors == "standard":
-            prop_cycle = plt.rcParams['axes.prop_cycle']
-            self.colors = prop_cycle.by_key()['color']
+            prop_cycle = plt.rcParams["axes.prop_cycle"]
+            self.colors = prop_cycle.by_key()["color"]
         else:
             self.colors = colors
         # generelle Festlegungen zu Plot-Linienarten
         if linestyles == "standard":
-            self.linestyles = ["-"] * len(self.colors)  # so viele durchgezogene Linien in Liste wie es Farben gibt
+            self.linestyles = ["-"] * len(
+                self.colors
+            )  # so viele durchgezogene Linien in Liste wie es Farben gibt
         else:
             self.linestyles = linestyles
 
-    def neues_diagramm(self, layout='constrained'):
+    def neues_diagramm(self, layout="constrained"):
         """
         Erstellung eines neuen Diagramms mit einer y-Achse
         :param layout: Layout des Diagramms
@@ -62,7 +70,7 @@ class Diagramm:
     def set_legend(self, **kwargs):
         self.ax1.legend(**kwargs)
 
-    def speichern(self, bbox_inches='tight', **kwargs):
+    def speichern(self, bbox_inches="tight", **kwargs):
         """
         Speichern des Diagramms unter dem gegebenen Pfad+Namen
         :param bbox_inches: Bestimmt Umgang mit weißem Rand um Diagramm, 'tight' entfernt diesen

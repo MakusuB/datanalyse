@@ -6,9 +6,21 @@ from . import diagramm
 
 
 class GlobalDiagramm(diagramm.Diagramm):
-    def __init__(self, name, daten: pd.DataFrame, x_werte, xlabel="Versuchsvarianten", ylabel="Verteilung (%)",
-                 normieren=True, bewertungsskala=None, farben=None, beschriftung=False, legende=True, speichern=True,
-                 **kwargs):
+    def __init__(
+        self,
+        name,
+        daten: pd.DataFrame,
+        x_werte,
+        xlabel="Versuchsvarianten",
+        ylabel="Verteilung (%)",
+        normieren=True,
+        bewertungsskala=None,
+        farben=None,
+        beschriftung=False,
+        legende=True,
+        speichern=True,
+        **kwargs,
+    ):
         """
         Diagramm zur Darstellung von PMV/TSV-Werten (Globale Behaglichkeitskriterien)
         :param name: (Datei)name des Diagramms
@@ -28,10 +40,20 @@ class GlobalDiagramm(diagramm.Diagramm):
         self.x_werte = x_werte
 
         if normieren:
-            self.daten = self.daten.transform(lambda row: row / row.sum() * 100, axis=1)  # axis=1 für Reihenbetrachtung
+            self.daten = self.daten.transform(
+                lambda row: row / row.sum() * 100, axis=1
+            )  # axis=1 für Reihenbetrachtung
 
         if bewertungsskala is None:
-            bewertungsskala = [-3, -2, -1, 0, 1, 2, 3]  # Notenbewertung für globale Behaglichkeit
+            bewertungsskala = [
+                -3,
+                -2,
+                -1,
+                0,
+                1,
+                2,
+                3,
+            ]  # Notenbewertung für globale Behaglichkeit
         self.bewertungsskala = bewertungsskala
 
         # ergänze leere Spalten, falls eine der Bewertungen nicht in den Daten auftaucht (sonst Fehlermeldung)
@@ -42,10 +64,18 @@ class GlobalDiagramm(diagramm.Diagramm):
                 self.daten[i] = 0
 
         if farben is None:
-            farben = ["royalblue", "dodgerblue", "lightskyblue", "limegreen", "gold", "orange", "red"]  # Globalfarben
+            farben = [
+                "royalblue",
+                "dodgerblue",
+                "lightskyblue",
+                "limegreen",
+                "gold",
+                "orange",
+                "red",
+            ]  # Globalfarben
         self.farben = farben
 
-        '''Beginn Diagrammerzeugung'''
+        """Beginn Diagrammerzeugung"""
         self.gestapeltebalken(beschriftung=beschriftung)
         # self.set_axlabels(xlabel, ylabel)
         self.ax1.set(xlabel=xlabel, ylabel=ylabel)
@@ -78,7 +108,9 @@ class GlobalDiagramm(diagramm.Diagramm):
             bewertung = self.bewertungsskala[i]
             farbe = self.farben[i]
             y_werte = self.daten[bewertung]
-            self.ax1.bar(self.x_werte, y_werte, label=bewertung, color=farbe, bottom=start)
+            self.ax1.bar(
+                self.x_werte, y_werte, label=bewertung, color=farbe, bottom=start
+            )
             # Beschriftung der Balken mit Werten (zentriert)
             if beschriftung:
                 for xpos, ypos, yval in zip(self.x_werte, start + y_werte / 2, y_werte):

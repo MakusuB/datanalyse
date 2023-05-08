@@ -3,11 +3,20 @@ import numpy as np
 
 
 class BalkenDiagramm(diagramm.Diagramm):
-    def __init__(self, name, daten_ax1: list, daten_ax2: list = None,
-                 titel=None, x_label=None, y1_label=None, y2_label=None,
-                 plot_labels: list = "auto", xtick_labels: list = "auto",
-                 xtick_rotation=False,
-                 **kwargs):
+    def __init__(
+        self,
+        name,
+        daten_ax1: list,
+        daten_ax2: list = None,
+        titel=None,
+        x_label=None,
+        y1_label=None,
+        y2_label=None,
+        plot_labels: list = "auto",
+        xtick_labels: list = "auto",
+        xtick_rotation=False,
+        **kwargs,
+    ):
         """
         Erstellung eines Zeitreihendiagramms auf Basis von Dataframe-Serien
         :param name: Name des Diagramms
@@ -34,8 +43,12 @@ class BalkenDiagramm(diagramm.Diagramm):
         super().__init__(name, y2=y2, **kwargs)
 
         # Bestimmung der Anzahl, Breite, Abstand etc. der Balken
-        anzahl_datenreihen = len(self.daten)  # Anzahl unterschiedlicher Balken nebeneinander in einer "Gruppe"
-        width = (1 - 0.2) / anzahl_datenreihen  # normierte Breite jedes Balkens (20 % Abstand zwischen Balkengruppen)
+        anzahl_datenreihen = len(
+            self.daten
+        )  # Anzahl unterschiedlicher Balken nebeneinander in einer "Gruppe"
+        width = (
+            1 - 0.2
+        ) / anzahl_datenreihen  # normierte Breite jedes Balkens (20 % Abstand zwischen Balkengruppen)
         x = np.arange(len(daten_ax1[0].index))  # grundsätzliche Anzahl xtick-Positionen
 
         # Beschriftung der x-Achsen-Werte
@@ -45,7 +58,7 @@ class BalkenDiagramm(diagramm.Diagramm):
             labels = xtick_labels
 
         if xtick_rotation:
-            self.ax1.set_xticks(x, labels, rotation=45, horizontalalignment='right')
+            self.ax1.set_xticks(x, labels, rotation=45, horizontalalignment="right")
         else:
             self.ax1.set_xticks(x, labels)
 
@@ -70,9 +83,13 @@ class BalkenDiagramm(diagramm.Diagramm):
 
         # Zeichne Graphen für 1. y-Achse
         for daten in daten_ax1:
-            self.ax1.bar(xpos.pop(0), daten, width,
-                         label=self.plot_labels.pop(0),
-                         color=self.colors.pop(0))
+            self.ax1.bar(
+                xpos.pop(0),
+                daten,
+                width,
+                label=self.plot_labels.pop(0),
+                color=self.colors.pop(0),
+            )
 
         # grundsätzliche Diagrammformatierung
         self.ax1.grid(axis="x", visible=None)
@@ -85,9 +102,13 @@ class BalkenDiagramm(diagramm.Diagramm):
             if plot_labels == "auto":
                 self.plot_labels = [daten.name for daten in daten_ax2]
             for daten in daten_ax2:
-                self.ax2.bar(xpos.pop(0), daten, width,
-                             label=self.plot_labels.pop(0),
-                             color=self.colors.pop(0))
+                self.ax2.bar(
+                    xpos.pop(0),
+                    daten,
+                    width,
+                    label=self.plot_labels.pop(0),
+                    color=self.colors.pop(0),
+                )
             self.ax2.set(ylabel=y2_label)
             self.ax2.grid(visible=None)
             handles2, labels2 = self.ax2.get_legend_handles_labels()
@@ -96,5 +117,10 @@ class BalkenDiagramm(diagramm.Diagramm):
             self.ncol += len(daten_ax2)
 
         # Erstelle Legende
-        self.set_legend(handles=self.handles, labels=self.labels, bbox_to_anchor=(0.5, -0.2), loc="upper center",
-                        ncol=self.ncol)
+        self.set_legend(
+            handles=self.handles,
+            labels=self.labels,
+            bbox_to_anchor=(0.5, -0.2),
+            loc="upper center",
+            ncol=self.ncol,
+        )
