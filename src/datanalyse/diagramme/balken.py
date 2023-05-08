@@ -1,4 +1,4 @@
-import diagramm
+from . import diagramm
 import numpy as np
 
 

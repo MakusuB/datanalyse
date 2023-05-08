@@ -1,5 +1,4 @@
-import diagramm
-
+from . import diagramm
 
 class ZeitreihenDiagramm(diagramm.Diagramm):
     def __init__(

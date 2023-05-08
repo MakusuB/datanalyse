@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 
 # from .dataelement import Dataelement - does not work in vsc
 # from src.datanalyse.dataelement.dataelement import Dataelement - does not work in vsc
-from dataelement import Dataelement
-import dfmanipulation as dfm
+from .dataelement import Dataelement
+from . import dfmanipulation as dfm
 
 
 def wincontrol_standard(
