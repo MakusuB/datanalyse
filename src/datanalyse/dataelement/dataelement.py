@@ -16,7 +16,8 @@ class Dataelement:
         Objekt, welches die Daten einer Datei / eines Versuchs / einer Versuchsreihe beinhaltet.
         Ein Dataelement kann wiederum aus mehreren Unterelementen bestehen und/oder zu einem Oberelement dazugehören.
         :param pfad: Pfad zur Datei / zum Versuch(sreihen)ordner (als pathlib-Objekt)
-        :param daten: Daten (als Dataframe-Objekt, optional)
+        :param daten: Daten (als Dataframe-Objekt, optional)        
+        :param name: Name des Dataelements (optional), entspricht falls nicht angegeben dem Datei-/Ordnernamen
         :param oberelement: Zuweisung des Objekts zu einem übergeordneten Dataelement (optional)
         :param unterelemente: Liste mit allen zum Objekt gehörenden untergeordneten Dataelementen (optional)
         """
