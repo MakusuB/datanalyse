@@ -107,7 +107,7 @@ class Dataelement:
         if self.elementtyp == "datei":
             for key in format_dict.keys():
                 if key in self.name:
-                    self.daten = format_dict[key](Dataelement=self)
+                    self.daten = format_dict[key](dataelement=self)
                     break
         else:
             print(

@@ -8,7 +8,7 @@ from . import dfmanipulation as dfm
 
 
 def wincontrol_standard(
-    datenelement: Dataelement,
+    dataelement: Dataelement,
     dropna_spalten=True,
     dropna_zeilen=True,
     rolling_zeitschritt=None,
@@ -17,7 +17,7 @@ def wincontrol_standard(
 ):
     """
     Standard-Einlese-Formatierung für xlsx-Daten aus einer WinControl-Tabelle
-    :param datenelement: Dataelement
+    :param dataelement: Dataelement
     :param dropna_spalten: drop alle leeren Spalten
     :param dropna_zeilen: drop alle Zeilen mit teilweise leerem Inhalt
     :param rolling_zeitschritt: Es wird über die Höhe des Zeitschritts der gleitende Mittelwert gebildet
@@ -26,7 +26,7 @@ def wincontrol_standard(
     :return: formatiertes Dataelement
     """
     df = pd.read_excel(
-        datenelement.pfad,
+        dataelement.pfad,
         sheet_name=0,
         parse_dates=[
             ["Datum", "Zeit"]
@@ -79,7 +79,7 @@ def wincontrol_standard(
 
 
 def wincontrol_csv(
-    datenelement: Dataelement,
+    dataelement: Dataelement,
     dropna_spalten=True,
     dropna_zeilen=True,
     rolling_zeitschritt=None,
@@ -88,7 +88,7 @@ def wincontrol_csv(
 ):
     """
     Standard-Einlese-Formatierung für csv-Daten aus einer WinControl-Tabelle
-    :param datenelement: Dataelement
+    :param dataelement: Dataelement
     :param dropna_spalten: drop alle leeren Spalten
     :param dropna_zeilen: drop alle Zeilen mit teilweise leerem Inhalt
     :param rolling_zeitschritt: Es wird über die Höhe des Zeitschritts der gleitende Mittelwert gebildet
@@ -97,7 +97,7 @@ def wincontrol_csv(
     :return: formatiertes Dataelement
     """
     df = pd.read_csv(
-        datenelement.pfad,
+        dataelement.pfad,
         sep=";",
         decimal=",",
         encoding="ANSI",
@@ -131,9 +131,9 @@ def wincontrol_csv(
     return df
 
 
-def mothership(datenelement: Dataelement):
+def mothership(dataelement: Dataelement):
     df = pd.read_excel(
-        datenelement.pfad,
+        dataelement.pfad,
         sheet_name=0,
         header=4,
         index_col=0,
@@ -146,7 +146,7 @@ def mothership(datenelement: Dataelement):
     df.index = pd.to_datetime(df.index)
 
     # Das Datum der Messung wird aus dem Dateinamen entnommen
-    messdatum = pd.to_datetime(str(datenelement.pfad.name)[37:47], format="%d_%m_%Y")
+    messdatum = pd.to_datetime(str(dataelement.pfad.name)[37:47], format="%d_%m_%Y")
     # ersetze Datum im Zeitstempel durch das Datum der Speicherzeit
     df.index = df.index.map(
         lambda x: x.replace(
@@ -165,9 +165,9 @@ def mothership(datenelement: Dataelement):
     return df
 
 
-def klimaanlage(datenelement: Dataelement):
+def klimaanlage(dataelement: Dataelement):
     df = pd.read_excel(
-        datenelement.pfad,
+        dataelement.pfad,
         sheet_name=0,
         header=9,
         index_col="Name",  # Die Zeitstempel stehen in Excel unter der Spalte "Name"
@@ -215,13 +215,13 @@ def klimaanlage(datenelement: Dataelement):
     return df
 
 
-def umbuzoo_standard(datenelement: Dataelement):
+def umbuzoo_standard(dataelement: Dataelement):
     pass
 
 
-def umbuzoo_person(datenelement: Dataelement):
+def umbuzoo_person(dataelement: Dataelement):
     df = pd.read_excel(
-        datenelement.pfad,
+        dataelement.pfad,
         sheet_name=0,
         header=None,
         index_col=None,
@@ -283,9 +283,9 @@ def umbuzoo_person(datenelement: Dataelement):
     return df
 
 
-def umbuzoo_abschluss_viessmann(datenelement: Dataelement):
+def umbuzoo_abschluss_viessmann(dataelement: Dataelement):
     df = pd.read_excel(
-        datenelement.pfad,
+        dataelement.pfad,
         sheet_name=0,
         header=None,
         index_col=None,
@@ -360,9 +360,9 @@ def umbuzoo_abschluss_viessmann(datenelement: Dataelement):
     return df
 
 
-def umbuzoo_klimaraum(datenelement: Dataelement):
+def umbuzoo_klimaraum(dataelement: Dataelement):
     df = pd.read_excel(
-        datenelement.pfad,
+        dataelement.pfad,
         sheet_name=0,
         header=None,
         index_col=None,
@@ -447,9 +447,9 @@ def umbuzoo_klimaraum(datenelement: Dataelement):
     return df
 
 
-def umbuzoo_klimaraum_hybrid(datenelement: Dataelement):
+def umbuzoo_klimaraum_hybrid(dataelement: Dataelement):
     df = pd.read_excel(
-        datenelement.pfad,
+        dataelement.pfad,
         sheet_name=0,
         header=None,
         index_col=None,
@@ -570,9 +570,9 @@ def umbuzoo_klimaraum_hybrid(datenelement: Dataelement):
     return df
 
 
-def umbuzoo_klimaraum_viessmann(datenelement: Dataelement):
+def umbuzoo_klimaraum_viessmann(dataelement: Dataelement):
     df = pd.read_excel(
-        datenelement.pfad,
+        dataelement.pfad,
         sheet_name=0,
         header=None,
         index_col=None,
@@ -665,9 +665,9 @@ def umbuzoo_klimaraum_viessmann(datenelement: Dataelement):
     return df
 
 
-def versuchsleitung_normhybr(datenelement: Dataelement):
+def versuchsleitung_normhybr(dataelement: Dataelement):
     df = pd.read_excel(
-        datenelement.pfad,
+        dataelement.pfad,
         sheet_name=0,
         header=0,
         index_col=0,
@@ -684,7 +684,7 @@ def versuchsleitung_normhybr(datenelement: Dataelement):
     df.dropna(how="all", axis=1, inplace=True)
 
     # Konvertiere Uhrzeit mit dem Messdatum (Erhalt aus dem Änderungsdatum der Datei) zu echtem Zeitstempel
-    messdatum = datetime.utcfromtimestamp(datenelement.pfad.stat().st_mtime)
+    messdatum = datetime.utcfromtimestamp(dataelement.pfad.stat().st_mtime)
     df.index = df.index.map(lambda x: datetime.combine(messdatum, x))
 
     # Phasenspalte aufräumen, sodass nur noch Zeilen mit den Phasen-Startzeitpunkten enthalten sind
@@ -700,9 +700,9 @@ def versuchsleitung_normhybr(datenelement: Dataelement):
     return df
 
 
-def versuchsleitung_halbraum(datenelement: Dataelement):
+def versuchsleitung_halbraum(dataelement: Dataelement):
     df = pd.read_excel(
-        datenelement.pfad,
+        dataelement.pfad,
         sheet_name=0,
         header=9,
         index_col=1,
@@ -714,7 +714,7 @@ def versuchsleitung_halbraum(datenelement: Dataelement):
     )  # Löschen der ersten Zeile, da nur Einheiten enthalten
 
     # Konvertiere Uhrzeit mit dem Messdatum (Erhalt aus dem Änderungsdatum der Datei) zu echtem Zeitstempel
-    messdatum = datetime.utcfromtimestamp(datenelement.pfad.stat().st_mtime)
+    messdatum = datetime.utcfromtimestamp(dataelement.pfad.stat().st_mtime)
     df.index = df.index.map(lambda x: datetime.combine(messdatum, x))
 
     # 1 Minuten addiert, da die erste Umfrage einer Phase genau die relevante für die Phase DAVOR ist
@@ -724,9 +724,9 @@ def versuchsleitung_halbraum(datenelement: Dataelement):
     return df
 
 
-def versuchsleitung_viessmann(datenelement: Dataelement):
+def versuchsleitung_viessmann(dataelement: Dataelement):
     df = pd.read_excel(
-        datenelement.pfad,
+        dataelement.pfad,
         sheet_name=0,
         header=0,
         index_col=0,
@@ -734,7 +734,7 @@ def versuchsleitung_viessmann(datenelement: Dataelement):
     )
 
     # Konvertiere Uhrzeit mit dem Messdatum (Erhalt aus dem Änderungsdatum der Datei) zu echtem Zeitstempel
-    messdatum_raw = datenelement.name[:10].replace("_", "-")
+    messdatum_raw = dataelement.name[:10].replace("_", "-")
     messdatum = pd.to_datetime(messdatum_raw)
     df.index = df.index.map(lambda x: datetime.combine(messdatum, x))
 
@@ -742,9 +742,9 @@ def versuchsleitung_viessmann(datenelement: Dataelement):
     return df
 
 
-def versuchsleitung_standard(datenelement: Dataelement):
+def versuchsleitung_standard(dataelement: Dataelement):
     df = pd.read_excel(
-        datenelement.pfad,
+        dataelement.pfad,
         sheet_name=0,
         header=0,
         index_col=0,
