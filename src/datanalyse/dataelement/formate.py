@@ -105,8 +105,8 @@ def wincontrol_csv(
         header=2,
         skiprows=[3, 4, 5, 6],
         parse_dates=[[0, 1]],
-        dayfirst=True,
-    )  # Verhindert Verwechslung von Tag und Monat beim Einlesen des Datums
+        dayfirst=True,  # Verhindert Verwechslung von Tag und Monat beim Einlesen des Datums
+    )
 
     # Indexspalte einen ordentlichen Namen geben (heißt aktuell etwa "Kommentar_Unnamed: 1")
     df.index.names = ["Datum_Zeit"]
