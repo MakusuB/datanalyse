@@ -28,11 +28,12 @@ def wincontrol_standard(
     df = pd.read_excel(
         dataelement.pfad,
         sheet_name=0,
-        parse_dates=[
-            ["Datum", "Zeit"]
-        ],  # Datum und Zeit werden zum Zeitstempel kombiniert
+        # parse_dates=[["Datum", "Zeit"]],  # Kombination von Datum und Zeit nicht mehr möglich, da kein dayfirst
     )
 
+    # Kombination von Datum und Zeit zu Zeitstempel
+    df["Datum_Zeit"] = pd.to_datetime(str(df["Datum"]) + " " + str(df["Zeit"]), dayfirst=True)
+    
     # Zeitstempel wird als Index gesetzt
     df.set_index("Datum_Zeit", inplace=True)
 
