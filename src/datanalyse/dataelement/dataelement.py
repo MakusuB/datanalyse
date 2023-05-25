@@ -16,7 +16,7 @@ class Dataelement:
         Objekt, welches die Daten einer Datei / eines Versuchs / einer Versuchsreihe beinhaltet.
         Ein Dataelement kann wiederum aus mehreren Unterelementen bestehen und/oder zu einem Oberelement dazugehören.
         :param pfad: Pfad zur Datei / zum Versuch(sreihen)ordner (als pathlib-Objekt)
-        :param daten: Daten (als Dataframe-Objekt, optional)        
+        :param daten: Daten (als Dataframe-Objekt, optional)
         :param name: Name des Dataelements (optional), entspricht falls nicht angegeben dem Datei-/Ordnernamen
         :param oberelement: Zuweisung des Objekts zu einem übergeordneten Dataelement (optional)
         :param unterelemente: Liste mit allen zum Objekt gehörenden untergeordneten Dataelementen (optional)
@@ -51,10 +51,9 @@ class Dataelement:
             self.ist_unterelement_von(oberelement)
 
         # Liste der Unterelement(e) festlegen, wenn welche angegeben sind (kann auch später erfolgen)
-        if unterelemente is None:
-            self.unterelemente = list()
-        else:
-            self.unterelemente = unterelemente
+        self.unterelemente = list()
+        for unterelement in unterelemente:
+            self.unterelemente.append(unterelement)
 
     def ist_unterelement_von(self, oberelement):
         """
@@ -227,13 +226,11 @@ class Dataelement:
             datetime.now(),
             "Testfunktion ausgelöst von",
             self.name + ":",
-            "Anzahl Unterelemente?",
+            "\nAnzahl Unterelemente?",
             anzahl_der_unterelemente,
-            "Namen der Unterelemente?",
+            "\nNamen der Unterelemente?",
             liste_der_unterelementnamen,
         )
-
-        return self.unterelemente[0]
 
 
 if __name__ == "__main__":
